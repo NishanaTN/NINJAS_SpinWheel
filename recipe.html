@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inedible Recipe Book</title>
+    <style>
+        body { font-family: Arial,sans-serif; background: #f8f5f2; margin: 0; }
+        header { background: #6c5ce7; color: white; padding: 15px; text-align: center; }
+        main { padding: 20px; max-width: 800px; margin: auto; }
+        .recipe { background: white; padding: 15px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #6c5ce7; }
+        ul { padding-left: 20px; }
+        ol { padding-left: 20px; }
+        .fun-note { font-size: 1.1em; color: #555; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📖 The Inedible Gourmet</h1>
+    </header>
+    <main>
+        <div class="fun-note">
+            <strong>Auto-generated inedible recipes:</strong> New batch every refresh!
+        </div>
+        <div id="recipeBook"></div>
+    </main>
+    <script>
+        // Arrays for random generation
+        const nouns = [
+            "Mud", "Pebble", "Clock", "Shoe", "Laser", "Feather", "Moonbeam", "Sock", "Cloud", "Tape", "Duct",
+            "Sawdust", "Brick", "Leaf", "Bubble", "Dust", "Shadow", "Pillow", "Marble", "Air", "Plastic"
+        ];
+        const adjectives = [
+            "Sparkling", "Mysterious", "Quantum", "Invisible", "Chewy", "Exploding", "Temporal", "Galactic",
+            "Whispering", "Uncooked", "Confused", "Radiant", "Elegant", "Squishy", "Haunted", "Wobbly"
+        ];
+        const dishTypes = [
+            "Pie", "Soufflé", "Stew", "Salad", "Delight", "Casserole", "Smoothie", "Taco", "Mousse", "Brew",
+            "Cupcake", "Donut", "Platter", "Shake", "Lasagna"
+        ];
+        const fakeIngredients = [
+            "One handful of dryer lint", "Three lost socks", "A pinch of moonlight", "2 glitter pebbles",
+            "Shredded newspaper", "Plastic spoons (recycled)", "Imaginary sprinkles", "Crushed autumn leaves",
+            "Bubble wrap (unpopped)", "Sawdust confetti", "Invisible ink", "Duct tape (to taste)",
+            "Not a single pea", "Wind from the east", "Pet hair (optional)"
+        ];
+        const fakeSteps = [
+            "Arrange all items artistically on a dinner plate.",
+            "Chant 'Bon appétit!' and swirl items gently.",
+            "Stir counterclockwise while humming.",
+            "Let sit in sunlight until boredom sets in.",
+            "Serve with a side of confusion.",
+            "Decorate with imaginary parsley.",
+            "Refrigerate until intergalactic travel is achieved.",
+            "Take a dramatic photo and post nowhere.",
+            "Admire from a safe distance.",
+            "Remind guests: Absolutely, do NOT eat."
+        ];
+
+        // Generate a random integer in [min, max]
+        function randInt(min, max) {
+            return min + Math.floor(Math.random() * (max-min+1));
+        }
+
+        // Generate one funny recipe object
+        function generateRecipe() {
+            // Title
+            let title = `${adjectives[randInt(0, adjectives.length-1)]} ${nouns[randInt(0, nouns.length-1)]} ${dishTypes[randInt(0, dishTypes.length-1)]}`;
+
+            // Description
+            let description = [
+                "A masterpiece designed exclusively for display, not consumption.",
+                "Perfect for confusing dinner guests and inspiring odd looks.",
+                "Crafted for artists, dreamers, and lovers of the inedibly absurd.",
+                "Guaranteed to be the talk of your next imaginary feast.",
+                "Best served with a tall glass of astonishment."
+            ][randInt(0,4)];
+
+            // Ingredients
+            let numIngredients = randInt(3,5);
+            let ingredients = [];
+            while(ingredients.length < numIngredients) {
+                let ing = fakeIngredients[randInt(0,fakeIngredients.length-1)];
+                if(!ingredients.includes(ing)) ingredients.push(ing);
+            }
+
+            // Steps
+            let numSteps = randInt(3,5);
+            let steps = [];
+            while(steps.length < numSteps) {
+                let step = fakeSteps[randInt(0,fakeSteps.length-1)];
+                if(!steps.includes(step)) steps.push(step);
+            }
+
+            return { title, description, ingredients, steps };
+        }
+
+        // Generate 3 to 5 recipes on each visit
+        function generateRecipeBook() {
+            const numRecipes = randInt(3,5);
+            let recipes = [];
+            for(let i=0;i<numRecipes;i++) {
+                recipes.push(generateRecipe());
+            }
+            return recipes;
+        }
+
+        // Render
+        function displayRecipes(recipes) {
+            const container = document.getElementById("recipeBook");
+            container.innerHTML = "";
+            recipes.forEach(recipe => {
+                const div = document.createElement("div");
+                div.classList.add("recipe");
+                div.innerHTML = `
+                    <h2>${recipe.title}</h2>
+                    <p>${recipe.description}</p>
+                    <h4>Ingredients:</h4>
+                    <ul>${recipe.ingredients.map(ing => `<li>${ing}</li>`).join("")}</ul>
+                    <h4>Steps:</h4>
+                    <ol>${recipe.steps.map(step => `<li>${step}</li>`).join("")}</ol>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Main flow
+        displayRecipes(generateRecipeBook());
+    </script>
+</body>
+</html>

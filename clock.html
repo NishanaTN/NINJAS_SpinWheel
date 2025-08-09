@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chrono-13 — A Time That Doesn't Exist</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --card:#0f1724;
+    --accent:#7be5d4;
+    --muted:#9aa6b2;
+    --glass: rgba(255,255,255,0.04);
+  }
+  html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{
+    background: radial-gradient(1200px 600px at 10% 20%, #05202a 0%, transparent 20%),
+                radial-gradient(1000px 500px at 90% 80%, #20102b33 0%, transparent 15%),
+                var(--bg);
+    display:flex;align-items:center;justify-content:center;padding:32px;
+    color:white;
+  }
+
+  .card{
+    width:360px; max-width:94vw; padding:22px; border-radius:16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+    backdrop-filter: blur(6px);
+  }
+
+  .title{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .logo{
+    width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#4d9fbf);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#062023;box-shadow:0 6px 20px rgba(123,229,212,0.12);
+  }
+  h1{font-size:18px;margin:0}
+  p.desc{margin:6px 0 18px;color:var(--muted);font-size:13px}
+
+  .clock{
+    display:flex;align-items:center;gap:16px;
+  }
+
+  .analog{
+    width:128px;height:128px;border-radius:50%;background:var(--glass);position:relative;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.6), 0 6px 20px rgba(2,6,12,0.6);
+    border: 1px solid rgba(255,255,255,0.03);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ticks{position:absolute;width:100%;height:100%;border-radius:50%}
+  .tick{position:absolute;left:50%;top:4%;transform-origin:0 60%;width:2px;height:10px;background:rgba(255,255,255,0.65);border-radius:2px}
+  .dial-center{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,#fff,#d0f5ec);box-shadow:0 2px 6px rgba(0,0,0,0.5);}
+
+  .hand{
+    position:absolute;left:50%;top:50%;transform-origin:50% 90%;
+  }
+  .hour{width:4px;height:36px;border-radius:3px;background:linear-gradient(180deg,#fff,#e4fff6);transform: translateX(-50%) rotate(0deg);box-shadow:0 2px 6px rgba(0,0,0,0.45)}
+  .minute{width:3px;height:48px;border-radius:3px;background:linear-gradient(180deg,#fff,#cfeee4);transform: translateX(-50%) rotate(0deg);opacity:0.95}
+  .second{width:2px;height:58px;border-radius:3px;background:linear-gradient(180deg,var(--accent),#2ec4b6);transform: translateX(-50%) rotate(0deg);box-shadow:0 1px 8px rgba(0,0,0,0.45)}
+
+  .digital{
+    flex:1;
+    display:flex;flex-direction:column;gap:8px;
+  }
+
+  .time-large{
+    font-family: "SF Mono", ui-monospace, "Courier New", monospace;
+    font-size:28px;letter-spacing:1px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .mode{padding:6px 8px;background:#05171b;border-radius:8px;color:var(--muted);font-size:12px;border:1px solid rgba(255,255,255,0.02)}
+
+  .controls{margin-top:12px;display:flex;gap:8px;align-items:center}
+  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer;font-size:13px}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#5ec0b3);color:#042a27;border:none}
+  .small{font-size:12px;padding:6px 8px;border-radius:8px}
+
+  footer.note{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+  <div class="card" role="region" aria-label="Chrono 13 clock">
+    <div class="title">
+      <div class="logo">C13</div>
+      <div>
+        <h1>Chrono-13</h1>
+        <p class="desc">A clock that shows a time system that doesn't exist: 13 hours · 100 minutes · 100 seconds per day.</p>
+      </div>
+    </div>
+
+    <div class="clock">
+      <div class="analog" aria-hidden="true">
+        <div class="ticks" id="ticks"></div>
+
+        <div class="hand hour" id="hand-hour"></div>
+        <div class="hand minute" id="hand-minute"></div>
+        <div class="hand second" id="hand-second"></div>
+
+        <div class="dial-center"></div>
+      </div>
+
+      <div class="digital">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="time-large" id="chrono-time">--:--:--</div>
+          <div class="mode">13h · 100m · 100s</div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="copyBtn" title="Copy Chrono time">Copy</button>
+          <button class="btn" id="freezeBtn" title="Pause/Resume">Pause</button>
+          <button class="btn primary small" id="randomizeBtn" title="Jump to random Chrono time">Warp</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="note">Chrono-13 maps the 86,400 real seconds of a day → 130,000 chrono-seconds (13×100×100). It’s just a playful remapping.</footer>
+  </div>
+
+<script>
+  // Build tick marks
+  (function makeTicks(){
+    const ticks = document.getElementById('ticks');
+    for(let i=0;i<60;i++){
+      const t = document.createElement('div');
+      t.className='tick';
+      t.style.transform = `translateX(-50%) rotate(${i*6}deg)`;
+      if(i%5!==0) t.style.opacity = '0.5';
+      else{
+        t.style.height='14px';
+        t.style.background='rgba(255,255,255,0.85)';
+      }
+      ticks.appendChild(t);
+    }
+  })();
+
+  const REAL_SECONDS_PER_DAY = 24*60*60;
+  const CHRONO_SECONDS_PER_DAY = 13*100*100;
+  const SCALE = CHRONO_SECONDS_PER_DAY / REAL_SECONDS_PER_DAY;
+
+  const elChrono = document.getElementById('chrono-time');
+  const handHour = document.getElementById('hand-hour');
+  const handMinute = document.getElementById('hand-minute');
+  const handSecond = document.getElementById('hand-second');
+
+  let paused = false;
+  let offsetChronoSeconds = 0;
+
+  function getRealMidnightTimestamp(d=new Date()){
+    const midnight = new Date(d);
+    midnight.setHours(0,0,0,0);
+    return midnight.getTime();
+  }
+
+  function computeChronoFromReal(now = new Date()){
+    const msSinceMid = now.getTime() - getRealMidnightTimestamp(now);
+    const realSeconds = msSinceMid / 1000;
+    let chronoSeconds = realSeconds * SCALE;
+    chronoSeconds = (chronoSeconds + offsetChronoSeconds) % CHRONO_SECONDS_PER_DAY;
+    if (chronoSeconds < 0) chronoSeconds += CHRONO_SECONDS_PER_DAY;
+
+    const chronoH = Math.floor(chronoSeconds / (100*100));
+    const rem = chronoSeconds % (100*100);
+    const chronoM = Math.floor(rem / 100);
+    const chronoS = Math.floor(rem % 100);
+
+    const fracOfDay = chronoSeconds / CHRONO_SECONDS_PER_DAY;
+    return {chronoH, chronoM, chronoS, chronoSeconds, fracOfDay};
+  }
+
+  function pad(n, len=2){ return String(n).padStart(len,'0'); }
+
+  function update(){
+    const now = new Date();
+    const {chronoH, chronoM, chronoS, fracOfDay} = computeChronoFromReal(now);
+
+    elChrono.textContent = `${pad(chronoH,2)}:${pad(chronoM,2)}:${pad(chronoS,2)}`;
+
+    const hourDeg = ((chronoH + chronoM/100 + chronoS/10000) / 13) * 360;
+    const minDeg = ((chronoM + chronoS/100) / 100) * 360;
+    const secDeg = (chronoS / 100) * 360;
+
+    handHour.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+    handMinute.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+    handSecond.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+  }
+
+  let loopId;
+  function startLoop(){
+    if(loopId) cancelAnimationFrame(loopId);
+    function loop(){
+      if(!paused) update();
+      loopId = requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  document.getElementById('freezeBtn').addEventListener('click', ()=>{
+    paused = !paused;
+    document.getElementById('freezeBtn').textContent = paused ? 'Resume' : 'Pause';
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    const text = elChrono.textContent + ' (Chrono-13)';
+    try{
+      await navigator.clipboard.writeText(text);
+      document.getElementById('copyBtn').textContent = 'Copied!';
+      setTimeout(()=> document.getElementById('copyBtn').textContent = 'Copy',800);
+    }catch(e){
+      alert('Could not copy: ' + e);
+    }
+  });
+
+  document.getElementById('randomizeBtn').addEventListener('click', ()=>{
+    const random = Math.floor(Math.random() * CHRONO_SECONDS_PER_DAY);
+    const now = new Date();
+    const {chronoSeconds} = computeChronoFromReal(now);
+    offsetChronoSeconds = (random - chronoSeconds);
+    document.getElementById('randomizeBtn').textContent = 'Warped!';
+    setTimeout(()=> document.getElementById('randomizeBtn').textContent = 'Warp',900);
+  });
+
+  startLoop();
+  setInterval(()=> { if(!paused) update(); }, 250);
+</script>
+</body>
+</html>

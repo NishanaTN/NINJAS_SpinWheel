@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spin Wheel with Confetti</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ffe6e6, #e0f7fa);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #wheel-container {
+      position: relative;
+      width: 420px;
+      height: 420px;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid #2d3436;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+      transform: rotate(0deg);
+      overflow: hidden;
+    }
+
+    .division {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      clip-path: polygon(50% 50%, 100% 0%, 100% 100%);
+      transform-origin: center;
+    }
+
+    .division:nth-child(1) {
+      background: radial-gradient(circle at center, #ff9a9e, #fad0c4);
+      transform: rotate(0deg);
+    }
+
+    .division:nth-child(2) {
+      background: radial-gradient(circle at center, #a1c4fd, #c2e9fb);
+      transform: rotate(90deg);
+    }
+
+    .division:nth-child(3) {
+      background: radial-gradient(circle at center, #fbc2eb, #a6c1ee);
+      transform: rotate(180deg);
+    }
+
+    .division:nth-child(4) {
+      background: radial-gradient(circle at center, #ffecd2, #fcb69f);
+      transform: rotate(270deg);
+    }
+
+    .division button {
+      position: absolute;
+      top: 50%;
+      left: 75%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      padding: 14px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      background: white;
+      color: #2d3436;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0.5;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    #pointer {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #d63031;
+      z-index: 10;
+    }
+
+    #spinBtn {
+      margin-top: 30px;
+      padding: 12px 30px;
+      font-size: 18px;
+      background-color: #2d3436;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #spinBtn:hover {
+      background-color: #636e72;
+    }
+
+    #message {
+      margin-top: 25px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #2d3436;
+    }
+
+    canvas.confetti-canvas {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="wheel-container">
+    <div id="pointer"></div>
+    <div id="wheel">
+      <div class="division" data-page="clock.html" data-label="Clock">
+        <button>⏰ Clock</button>
+      </div>
+      <div class="division" data-page="calc.html" data-label="Calculator">
+        <button>🧮 Calculator</button>
+      </div>
+      <div class="division" data-page="cal.html" data-label="Calender">
+        <button>🗓 Calender</button>
+      </div>
+      <div class="division" data-page="recipe.html" data-label="Recipe Book">
+        <button>📖 Recipe Book</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="spinBtn">🎯 Spin the Wheel</button>
+  <div id="message"></div>
+
+  <!-- Sound -->
+  <audio id="spinSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c78c8b2c74.mp3?filename=spin-wheel-112504.mp3"></audio>
+
+  <!-- Canvas for confetti -->
+  <canvas class="confetti-canvas"></canvas>
+
+  <!-- Confetti script from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const wheel = document.getElementById('wheel');
+    const divisions = document.querySelectorAll('.division');
+    const buttons = document.querySelectorAll('.division button');
+    const message = document.getElementById('message');
+    const spinSound = document.getElementById('spinSound');
+    let angle = 0;
+
+    function enableButton(index) {
+      buttons.forEach((btn, i) => {
+        if (i === index) {
+          btn.style.opacity = 1;
+          btn.style.pointerEvents = 'auto';
+        } else {
+          btn.style.opacity = 0.5;
+          btn.style.pointerEvents = 'none';
+        }
+      });
+    }
+
+    function showConfetti() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    function spinWheel() {
+      message.textContent = '';
+      spinSound.currentTime = 0;
+      spinSound.play();
+
+      const totalSections = 4;
+      const targetIndex = Math.floor(Math.random() * totalSections);
+      const targetAngle = 360 * 5 + targetIndex * (360 / totalSections);
+      angle += targetAngle;
+
+      wheel.style.transform = `rotate(${angle}deg)`;
+
+      setTimeout(() => {
+        spinSound.pause();
+        enableButton(targetIndex);
+        const label = divisions[targetIndex].getAttribute('data-label');
+        message.textContent = `🎉 You got: ${label}!`;
+        showConfetti();
+      }, 5200);
+    }
+
+    divisions.forEach((div, index) => {
+      const button = div.querySelector('button');
+      const page = div.getAttribute('data-page');
+      button.addEventListener('click', () => {
+        window.location.href = page;
+      });
+    });
+
+    document.getElementById('spinBtn').addEventListener('click', spinWheel);
+  </script>
+
+</body>
+</html>

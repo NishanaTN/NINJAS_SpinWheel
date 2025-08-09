@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Always Wrong Calculator</title>
+<style>
+    body {
+        background: #111;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+    }
+    .calculator {
+        background: #222;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    }
+    .display {
+        background: #000;
+        color: #0f0;
+        font-size: 2em;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        text-align: right;
+        overflow-x: auto;
+    }
+    button {
+        width: 60px;
+        height: 60px;
+        margin: 5px;
+        font-size: 1.5em;
+        border: none;
+        border-radius: 8px;
+        background: #333;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #444;
+    }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+    <div id="display" class="display">0</div>
+    <div>
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button onclick="append('/')">÷</button>
+    </div>
+    <div>
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button onclick="append('*')">×</button>
+    </div>
+    <div>
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button onclick="append('-')">−</button>
+    </div>
+    <div>
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button onclick="calculate()">=</button>
+        <button onclick="append('+')">+</button>
+    </div>
+    <div>
+        <button style="width: 100%" onclick="clearDisplay()">C</button>
+    </div>
+</div>
+
+<script>
+let expression = "";
+
+function append(value) {
+    if (expression === "0") expression = "";
+    expression += value;
+    document.getElementById("display").innerText = expression;
+}
+
+function clearDisplay() {
+    expression = "";
+    document.getElementById("display").innerText = "0";
+}
+
+function calculate() {
+    try {
+        let result = eval(expression);
+        
+        // Introduce wrongness: add or subtract a random number
+        let error = (Math.random() * 10 - 5).toFixed(2); // between -5 and +5
+        let wrongResult = (result + parseFloat(error)).toFixed(2);
+
+        document.getElementById("display").innerText = wrongResult;
+        expression = wrongResult; 
+    } catch (e) {
+        document.getElementById("display").innerText = "Error";
+    }
+}
+</script>
+
+</body>
+</html>

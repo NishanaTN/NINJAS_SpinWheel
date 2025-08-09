@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Calendar That Doesn’t Exist</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0b0f18;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .calendar {
+        background: #151c2c;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.6);
+        max-width: 500px;
+        text-align: center;
+    }
+    h1 {
+        margin-bottom: 10px;
+        color: #7be5d4;
+    }
+    .month-year {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+    }
+    th {
+        background: rgba(255,255,255,0.05);
+    }
+    td {
+        background: rgba(255,255,255,0.02);
+    }
+    .today {
+        background: #7be5d4;
+        color: black;
+        font-weight: bold;
+        border-radius: 4px;
+    }
+    .controls {
+        margin-bottom: 10px;
+    }
+    button {
+        background: #7be5d4;
+        border: none;
+        padding: 6px 12px;
+        margin: 0 5px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: #59c3b2;
+    }
+</style>
+</head>
+<body>
+
+<div class="calendar">
+    <h1>Calendar</h1>
+    <div class="controls">
+        <button onclick="prevMonth()">◀ Previous</button>
+        <button onclick="nextMonth()">Next ▶</button>
+    </div>
+    <div class="month-year" id="monthYear"></div>
+    <table>
+        <thead>
+            <tr id="weekDays"></tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+    </table>
+</div>
+
+<script>
+// Fictional calendar system
+const months = [
+    "Dawnrise", "Suncrest", "Moondim", "Starveil", "Stormtide",
+    "Flamecrest", "Frostwake", "Nightbloom", "Everdusk"
+];
+const weekDays = ["Sol", "Lun", "Terra", "Aqua", "Ignis", "Ventus", "Lux", "Umbra"];
+const daysInMonth = 40; // fictional rule
+
+let currentYear = 182;
+let currentMonth = Math.floor(Math.random() * months.length);
+
+function generateCalendar(year, month) {
+    document.getElementById("monthYear").textContent = `${months[month]} — Year ${year}`;
+
+    const weekDaysRow = document.getElementById("weekDays");
+    weekDaysRow.innerHTML = weekDays.map(d => `<th>${d}</th>`).join("");
+
+    const body = document.getElementById("calendarBody");
+    body.innerHTML = "";
+
+    let day = 1;
+    const startDay = Math.floor(Math.random() * 8); // random start day
+
+    for (let i = 0; i < 6; i++) {
+        let row = "<tr>";
+        for (let j = 0; j < 8; j++) {
+            if (i === 0 && j < startDay) {
+                row += "<td></td>";
+            } else if (day > daysInMonth) {
+                row += "<td></td>";
+            } else {
+                row += `<td>${day}</td>`;
+                day++;
+            }
+        }
+        row += "</tr>";
+        body.innerHTML += row;
+    }
+}
+
+function prevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = months.length - 1;
+        currentYear--;
+    }
+    generateCalendar(currentYear, currentMonth);
+}
+
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth >= months.length) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    generateCalendar(currentYear, currentMonth);
+}
+
+// Initialize calendar
+generateCalendar(currentYear, currentMonth);
+</script>
+
+</body>
+</html>
